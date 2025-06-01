@@ -5,6 +5,7 @@ const authRoutes = require("./routes/authRoutes");
 const remedyRoutes = require("./routes/remedyRoutes");
 const vaccinationRoutes=require("./routes/vaccinationRoutes");
 const milestoneRoutes=require("./routes/milestoneRoutes");
+const chatbotRoutes = require("./routes/chatbotRoutes");
 
 
 dotenv.config();
@@ -20,6 +21,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/remedies", remedyRoutes);
 app.use("/api/vaccination",vaccinationRoutes);
 app.use("/api/milestone",milestoneRoutes);
+app.use("/api/chatbot", chatbotRoutes);
+
 
 
 const PORT = process.env.PORT || 5000;
