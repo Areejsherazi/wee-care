@@ -29,9 +29,28 @@ exports.addRemedy = async (req, res) => {
 
 exports.getAllRemedies = async (req, res) => {
   try {
-    const remedies = await Remedy.find().populate("parentId", "fullName profilePhoto");
+    const userId = req.user?._id; // may be undefined for public users
 
-    res.status(200).json(remedies);
+    const remedies = await Remedy.find()
+      .populate("parentId", "fullName profilePhoto")
+      .lean(); // lean to work with plain JS objects
+
+    const updatedRemedies = remedies.map((remedy) => {
+      const likeCount = remedy.likes?.length || 0;
+      const dislikeCount = remedy.dislikes?.length || 0;
+      const userLiked = userId ? remedy.likes.some(id => id.toString() === userId.toString()) : false;
+      const userDisliked = userId ? remedy.dislikes.some(id => id.toString() === userId.toString()) : false;
+
+      return {
+        ...remedy,
+        likeCount,
+        dislikeCount,
+        userLiked,
+        userDisliked,
+      };
+    });
+
+    res.status(200).json(updatedRemedies);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -58,3 +77,52 @@ exports.deleteRemedy = async (req, res) => {
     }
   };
   
+exports.likeRemedy = async (req, res) => {
+  try {
+    const { remedyId } = req.params;
+    const userId = req.user._id;
+
+    const remedy = await Remedy.findById(remedyId);
+    if (!remedy) return res.status(404).json({ message: "Remedy not found" });
+
+    // Remove user from dislikes if exists
+    remedy.dislikes = remedy.dislikes.filter(id => id.toString() !== userId.toString());
+
+    // Toggle like
+    if (remedy.likes.includes(userId)) {
+      remedy.likes.pull(userId);
+    } else {
+      remedy.likes.push(userId);
+    }
+
+    await remedy.save();
+    res.status(200).json({ message: "Like updated", likes: remedy.likes.length });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+exports.dislikeRemedy = async (req, res) => {
+  try {
+    const { remedyId } = req.params;
+    const userId = req.user._id;
+
+    const remedy = await Remedy.findById(remedyId);
+    if (!remedy) return res.status(404).json({ message: "Remedy not found" });
+
+    // Remove user from likes if exists
+    remedy.likes = remedy.likes.filter(id => id.toString() !== userId.toString());
+
+    // Toggle dislike
+    if (remedy.dislikes.includes(userId)) {
+      remedy.dislikes.pull(userId);
+    } else {
+      remedy.dislikes.push(userId);
+    }
+
+    await remedy.save();
+    res.status(200).json({ message: "Dislike updated", dislikes: remedy.dislikes.length });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};

@@ -6,6 +6,7 @@ const remedyRoutes = require("./routes/remedyRoutes");
 const vaccinationRoutes=require("./routes/vaccinationRoutes");
 const milestoneRoutes=require("./routes/milestoneRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
+const cors=require('cors');
 
 
 dotenv.config();
@@ -16,6 +17,8 @@ app.use("/uploads", express.static("uploads"));
 
 // Connect to Database
 connectDB();
+
+app.use(cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/remedies", remedyRoutes);
