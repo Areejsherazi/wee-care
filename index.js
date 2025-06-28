@@ -6,6 +6,7 @@ const remedyRoutes = require("./routes/remedyRoutes");
 const vaccinationRoutes=require("./routes/vaccinationRoutes");
 const milestoneRoutes=require("./routes/milestoneRoutes");
 const chatbotRoutes = require("./routes/chatbotRoutes");
+const requestRoutes=require('./routes/requestRoutes');
 const cors=require('cors');
 
 
@@ -25,6 +26,7 @@ app.use("/api/remedies", remedyRoutes);
 app.use("/api/vaccination",vaccinationRoutes);
 app.use("/api/milestone",milestoneRoutes);
 app.use("/api/chatbot", chatbotRoutes);
+app.use("/api/dietplan",requestRoutes);
 
 
 

@@ -38,3 +38,15 @@ exports.signup = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
+
+// Get all doctors
+exports.getAllDoctors = async (req, res) => {
+  try {
+    const doctors = await User.find({ role: "doctor" });
+
+    res.status(200).json({ message: "Doctors retrieved successfully", doctors });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
